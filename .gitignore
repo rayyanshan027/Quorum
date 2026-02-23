@@ -1,0 +1,12 @@
+__pycache__/
+*.pyc
+.env
+.DS_Store
+/data/
+*.ipynb_checkpoints
+*.pth
+*.pt
+*.npy
+*.tif
+models/
+predictions/

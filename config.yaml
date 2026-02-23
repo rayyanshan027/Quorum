@@ -1,0 +1,4 @@
+preprocess_mode: basic
+augmentation: standard
+target_size: [256, 256]
+train_val_split: 0.8

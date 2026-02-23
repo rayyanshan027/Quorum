@@ -1,0 +1,6 @@
+tifffile
+opencv-python-headless
+albumentations
+torch
+torchvision
+matplotlib
