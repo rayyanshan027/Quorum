@@ -1,7 +1,5 @@
 # Quorum: Cell Segmentation Benchmark
 
-This repository enables a **reproducible, fair comparison** of two independent model architectures for microscopy cell segmentation. All teams use a shared data pipeline and fixed validation split. Code is versioned on GitHub; data is stored on Google Drive.
-
 ---
 
 ## Project Structure
