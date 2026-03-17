@@ -19,7 +19,7 @@ export function SegmentationViewer({ processedImage, onEdit }: SegmentationViewe
   }, [processedImage]);
 
   return (
-    <Card className="p-4 border-[#304C64]">
+    <Card className="p-3 border-[#304C64]">
       <div className="flex items-center justify-between mb-3">
         <h3 style={{ color: '#304C64' }}>{processedImage.fileName}</h3>
         <div className="flex items-center gap-2">
@@ -56,7 +56,7 @@ export function SegmentationViewer({ processedImage, onEdit }: SegmentationViewe
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
         {/* Original Image */}
         <div>
           <h3 className="mb-2 text-sm" style={{ color: '#304C64' }}>Original</h3>
@@ -89,7 +89,7 @@ export function SegmentationViewer({ processedImage, onEdit }: SegmentationViewe
       </div>
 
       {/* Segmentation Masks */}
-      <div className="mt-6 pt-4 border-t" style={{ borderColor: '#A4CCD4' }}>
+      <div className="mt-4 pt-3 border-t" style={{ borderColor: '#A4CCD4' }}>
         <h4 className="text-sm mb-3" style={{ color: '#304C64' }}>Segmentation Masks:</h4>
         <div className="grid grid-cols-3 gap-4">
           <div>

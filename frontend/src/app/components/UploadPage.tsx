@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router';
 import { ImageUploader } from './ImageUploader';
 import { SegmentationViewer } from './SegmentationViewer';
 import { MaskEditor } from './MaskEditor';
-import { processBatch, ProcessedImage } from '../services/segmentationApi';
+import { processBatch, ProcessedImage, downloadAllMasks } from '../services/segmentationApi';
 import { useSegmentationSession } from '../context/SegmentationSessionContext';
 
 export function UploadPage() {
@@ -53,6 +53,18 @@ export function UploadPage() {
     navigate('/results');
   };
 
+  const handleDownloadAllTiffs = async () => {
+    try {
+      await downloadAllMasks(processedImages);
+    } catch (error: unknown) {
+      console.error('Error downloading all TIFFs:', error);
+      const message = error instanceof Error
+        ? error.message
+        : 'Failed to download all TIFFs. Please try again.';
+      alert(message);
+    }
+  };
+
   const handleSaveMasks = (
     fileName: string,
     masks: { chromocenter: string; nuclei: string; background: string },
@@ -75,23 +87,23 @@ export function UploadPage() {
   };
 
   return (
-    <main className="max-w-6xl mx-auto px-4 py-10 sm:px-6 lg:px-8">
+    <main className="max-w-5xl mx-auto px-4 py-6 sm:px-5 lg:px-6">
       {selectedImages.length === 0 && processedImages.length === 0 ? (
-        <div className="max-w-4xl mx-auto space-y-8">
+        <div className="max-w-4xl mx-auto space-y-6">
           <section
-            className="rounded-2xl p-6 sm:p-8 shadow-sm"
+            className="rounded-2xl p-5 sm:p-6 shadow-sm"
             style={{
               backgroundColor: 'white',
               border: '1px solid #A4CCD4',
             }}
           >
-            <div className="flex flex-col gap-6">
+            <div className="flex flex-col gap-5">
               <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
                 <div>
                   <p className="text-sm font-medium tracking-wide uppercase" style={{ color: '#26788E' }}>
                     Start a new analysis
                   </p>
-                  <h2 className="mt-1 text-3xl font-semibold" style={{ color: '#304C64' }}>
+                  <h2 className="mt-1 text-2xl font-semibold" style={{ color: '#304C64' }}>
                     Upload microscopy images
                   </h2>
                   <p className="mt-2 text-sm sm:text-base max-w-2xl" style={{ color: '#5C7285' }}>
@@ -140,7 +152,7 @@ export function UploadPage() {
                 <p className="text-sm font-medium tracking-wide uppercase" style={{ color: '#26788E' }}>
                   About this tool
                 </p>
-                <h3 className="mt-2 text-2xl font-semibold" style={{ color: '#304C64' }}>
+                <h3 className="mt-2 text-xl font-semibold" style={{ color: '#304C64' }}>
                   Fast sub-cellular instance segmentation
                 </h3>
                 <p className="mt-3 text-sm sm:text-base leading-7" style={{ color: '#5C7285' }}>
@@ -176,7 +188,7 @@ export function UploadPage() {
           </section>
         </div>
       ) : (
-        <div className="space-y-8">
+        <div className="space-y-6">
           <div
             className="rounded-2xl p-5 sm:p-6 shadow-sm"
             style={{
@@ -199,19 +211,35 @@ export function UploadPage() {
 
               <div className="flex flex-wrap gap-3">
                 {displayedProcessedCount === totalImagesCount && totalImagesCount > 0 && !isProcessing && (
-                  <button
-                    onClick={handleViewResults}
-                    className="px-5 py-3 text-sm font-medium rounded-xl"
-                    style={{
-                      backgroundColor: '#26788E',
-                      color: 'white',
-                      boxShadow: '0 6px 16px rgba(38, 120, 142, 0.18)',
-                    }}
-                    onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#304C64'}
-                    onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#26788E'}
-                  >
-                    View Results Summary
-                  </button>
+                  <>
+                    <button
+                      onClick={handleDownloadAllTiffs}
+                      className="px-5 py-3 text-sm font-medium rounded-xl"
+                      style={{
+                        backgroundColor: '#26788E',
+                        color: 'white',
+                        boxShadow: '0 6px 16px rgba(38, 120, 142, 0.18)',
+                      }}
+                      onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#304C64'}
+                      onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#26788E'}
+                    >
+                      Download All TIFFs
+                    </button>
+
+                    <button
+                      onClick={handleViewResults}
+                      className="px-5 py-3 text-sm font-medium rounded-xl"
+                      style={{
+                        backgroundColor: '#26788E',
+                        color: 'white',
+                        boxShadow: '0 6px 16px rgba(38, 120, 142, 0.18)',
+                      }}
+                      onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#304C64'}
+                      onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#26788E'}
+                    >
+                      View Results Summary
+                    </button>
+                  </>
                 )}
 
                 <button

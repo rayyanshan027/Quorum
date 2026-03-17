@@ -91,7 +91,6 @@ except Exception as e:
     print(f"Warning: Failed to load pretrained nuclei fallback model: {e}")
 
 
-
 # U-Net++ model
 unetpp_model = None
 unetpp_device = None
@@ -132,6 +131,17 @@ class MaskDownloadRequest(BaseModel):
     chromocenter_mask: str
     nuclei_mask: str
     background_mask: str
+
+
+class BulkMaskItem(BaseModel):
+    file_name: str
+    chromocenter_mask: str
+    nuclei_mask: str
+    background_mask: str
+
+
+class BulkMaskDownloadRequest(BaseModel):
+    items: list[BulkMaskItem]
 
 
 def _data_url_to_binary_mask(mask_data_url: str) -> np.ndarray:
@@ -192,6 +202,45 @@ def _build_mask_zip(file_name: str, chromocenter_mask: str, nuclei_mask: str, ba
         tif_buffer = io.BytesIO()
         tiff.imwrite(tif_buffer, bg_arr)
         zip_file.writestr(f"{base_name}_background.tif", tif_buffer.getvalue())
+
+    zip_buffer.seek(0)
+    return zip_buffer
+
+
+def _build_bulk_mask_zip(items: list[BulkMaskItem]) -> io.BytesIO:
+    """
+    build one zip for all images, with one folder per image
+    """
+    zip_buffer = io.BytesIO()
+
+    with zipfile.ZipFile(zip_buffer, "w", zipfile.ZIP_DEFLATED) as zip_file:
+        for item in items:
+            base_name = os.path.splitext(item.file_name)[0]
+
+            chrom_arr = _data_url_to_binary_mask(item.chromocenter_mask)
+            nuclei_arr = _data_url_to_binary_mask(item.nuclei_mask)
+            bg_arr = _data_url_to_binary_mask(item.background_mask)
+
+            tif_buffer = io.BytesIO()
+            tiff.imwrite(tif_buffer, chrom_arr)
+            zip_file.writestr(
+                f"{base_name}/{base_name}_chromocenter.tif",
+                tif_buffer.getvalue(),
+            )
+
+            tif_buffer = io.BytesIO()
+            tiff.imwrite(tif_buffer, nuclei_arr)
+            zip_file.writestr(
+                f"{base_name}/{base_name}_nuclei.tif",
+                tif_buffer.getvalue(),
+            )
+
+            tif_buffer = io.BytesIO()
+            tiff.imwrite(tif_buffer, bg_arr)
+            zip_file.writestr(
+                f"{base_name}/{base_name}_background.tif",
+                tif_buffer.getvalue(),
+            )
 
     zip_buffer.seek(0)
     return zip_buffer
@@ -289,7 +338,6 @@ async def segment_image(
                 "nucleus_model_available": nucleus_model is not None,
             }
 
-        
         # U-Net++ path
         elif model_name == "unetpp":
             if unetpp_model is None:
@@ -305,7 +353,7 @@ async def segment_image(
             prepared_image = result["prepared_image"]
             semantic_mask = result["semantic_mask"]
             summary = result["summary"]
-            cells_review = result["cells_review"]  
+            cells_review = result["cells_review"]
 
             # encodes original image
             _, original_buffer = cv2.imencode(".png", prepared_image)
@@ -360,4 +408,19 @@ async def download_masks(request: MaskDownloadRequest):
         )
     except Exception as e:
         print(f"Error creating mask download: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/api/download-all-masks")
+async def download_all_masks(request: BulkMaskDownloadRequest):
+    try:
+        zip_buffer = _build_bulk_mask_zip(request.items)
+
+        return StreamingResponse(
+            zip_buffer,
+            media_type="application/zip",
+            headers={"Content-Disposition": 'attachment; filename="all_segmentation_masks.zip"'},
+        )
+    except Exception as e:
+        print(f"Error creating bulk mask download: {e}")
         raise HTTPException(status_code=500, detail=str(e))

@@ -1,3 +1,5 @@
+import { saveAs } from 'file-saver';
+
 const BASE_URL = import.meta.env.VITE_API_BASE_URL ?? '/api';
 
 export interface ReviewCell {
@@ -69,13 +71,12 @@ export async function processImage(file: File, modelName: string): Promise<Segme
     ? ensureDataUrl(data.original_base64)
     : localImageUrl;
 
-  
   const rawMask = typeof data.semantic_mask_base64 === 'string' && data.semantic_mask_base64.length > 0
     ? data.semantic_mask_base64
     : data.mask_base64;
   const semanticDataUrl = ensureDataUrl(rawMask);
 
-  const chromocenterMask  = await colorizeMask(semanticDataUrl, [226, 72, 12],   (r) => r >= 200);
+  const chromocenterMask  = await colorizeMask(semanticDataUrl, [226, 72, 12], (r) => r >= 200);
   const nucleiMask        = await colorizeMask(semanticDataUrl, [38, 120, 142], (r) => r >= 100 && r < 200);
   const backgroundMask    = await colorizeMask(semanticDataUrl, [164, 204, 212], (r) => r < 100);
   const segmentedImageUrl = await overlayMaskOnImage(imageUrl, chromocenterMask);
@@ -144,6 +145,37 @@ export async function downloadMasks(processedImage: ProcessedImage): Promise<voi
 }
 
 /**
+ * Downloads TIFF masks for all processed images as one ZIP
+ */
+export async function downloadAllMasks(processedImages: ProcessedImage[]): Promise<void> {
+  if (processedImages.length === 0) {
+    throw new Error('No processed images available to download.');
+  }
+
+  const response = await fetch(`${BASE_URL}/download-all-masks`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      items: processedImages.map((processedImage) => ({
+        file_name: processedImage.fileName,
+        chromocenter_mask: processedImage.result.chromocenterMask,
+        nuclei_mask: processedImage.result.nucleiMask,
+        background_mask: processedImage.result.backgroundMask,
+      })),
+    }),
+  });
+
+  if (!response.ok) {
+    throw new Error('Failed to download all masks');
+  }
+
+  const blob = await response.blob();
+  saveAs(blob, 'all_segmentation_masks.zip');
+}
+
+/**
  * Processes multiple images in batch
  */
 export async function processBatch(
@@ -152,7 +184,7 @@ export async function processBatch(
   onProgress?: (current: number, total: number) => void
 ): Promise<ProcessedImage[]> {
   const results: ProcessedImage[] = [];
-  
+
   for (let i = 0; i < files.length; i++) {
     const file = files[i];
     const result = await processImage(file, modelName);
@@ -161,12 +193,12 @@ export async function processBatch(
       fileName: file.name,
       result,
     });
-    
+
     if (onProgress) {
       onProgress(i + 1, files.length);
     }
   }
-  
+
   return results;
 }
 

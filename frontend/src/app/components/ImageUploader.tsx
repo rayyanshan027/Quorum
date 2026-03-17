@@ -29,7 +29,7 @@ export function ImageUploader({ onImagesSelected }: ImageUploaderProps) {
     <div
       onDrop={handleDrop}
       onDragOver={handleDragOver}
-      className="border-2 border-dashed rounded-2xl px-6 py-16 text-center transition-colors shadow-sm"
+      className="border-2 border-dashed rounded-2xl px-6 py-10 text-center transition-colors shadow-sm"
       style={{
         borderColor: '#A4CCD4',
         backgroundColor: '#FCFEFF',
