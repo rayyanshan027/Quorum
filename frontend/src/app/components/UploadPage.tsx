@@ -3,6 +3,17 @@ import { useNavigate } from 'react-router';
 import { ImageUploader } from './ImageUploader';
 import { SegmentationViewer } from './SegmentationViewer';
 import { MaskEditor } from './MaskEditor';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from './ui/alert-dialog';
 import { processBatch, ProcessedImage, downloadAllMasks } from '../services/segmentationApi';
 import { useSegmentationSession } from '../context/SegmentationSessionContext';
 
@@ -63,6 +74,11 @@ export function UploadPage() {
         : 'Failed to download all TIFFs. Please try again.';
       alert(message);
     }
+  };
+
+  const handleStartNewSession = () => {
+    clearSession();
+    setProcessedCount(0);
   };
 
   const handleSaveMasks = (
@@ -130,7 +146,7 @@ export function UploadPage() {
                       boxShadow: '0 1px 2px rgba(0,0,0,0.04)',
                     }}
                   >
-                    <option value="unetpp">U-Net++</option>
+                    <option value="unetpp">U-Net++ </option>
                     <option value="cellpose">Cellpose</option>
                   </select>
                 </div>
@@ -242,22 +258,48 @@ export function UploadPage() {
                   </>
                 )}
 
-                <button
-                  onClick={() => {
-                    clearSession();
-                    setProcessedCount(0);
-                  }}
-                  className="px-5 py-3 text-sm font-medium rounded-xl"
-                  style={{
-                    backgroundColor: 'white',
-                    border: '1px solid #26788E',
-                    color: '#304C64',
-                  }}
-                  onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#F0F7F9'}
-                  onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'white'}
-                >
-                  Upload New Images
-                </button>
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <button
+                      className="px-5 py-3 text-sm font-medium rounded-xl"
+                      style={{
+                        backgroundColor: 'white',
+                        border: '1px solid #26788E',
+                        color: '#304C64',
+                      }}
+                      onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#F0F7F9'}
+                      onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'white'}
+                    >
+                      Upload New Images
+                    </button>
+                  </AlertDialogTrigger>
+
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>Start New Upload Session?</AlertDialogTitle>
+                      <AlertDialogDescription>
+                        Starting a new upload session will clear your current results. Please make
+                        sure you have downloaded any files you need before continuing.
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>Cancel</AlertDialogCancel>
+                      <AlertDialogAction
+                        onClick={handleStartNewSession}
+                        style={{
+                          backgroundColor: '#26788E',
+                          color: 'white',
+                          boxShadow: '0 6px 16px rgba(38, 120, 142, 0.18)',
+                        }}
+                        onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#304C64')}
+                        onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#26788E')}
+                      >
+                        Continue
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
               </div>
             </div>
           </div>

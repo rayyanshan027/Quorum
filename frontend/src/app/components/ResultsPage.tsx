@@ -111,7 +111,7 @@ export function ResultsPage() {
             onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'white'}
           >
             <ArrowLeft className="h-4 w-4" />
-            Back
+            Back to Results
           </button>
 
           <div className="flex items-center justify-between">
