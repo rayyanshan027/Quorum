@@ -186,7 +186,7 @@ export function ResultsPage() {
                 <div className="flex-grow">
                   <h3 className="mb-1" style={{ color: '#304C64' }}>{processedImg.fileName}</h3>
                   <p className="text-sm" style={{ color: '#26788E' }}>
-                    {(processedImg.file.size / 1024).toFixed(2)} KB
+                    {(processedImg.fileSize / 1024).toFixed(2)} KB
                   </p>
                   <p className="text-sm mt-1" style={{ color: '#26788E' }}>
                     Nuclei: {processedImg.result.summary?.nuclei_count ?? 0} | Chromocenters: {processedImg.result.summary?.chromocenter_count ?? 0}

@@ -30,7 +30,17 @@ export function SegmentationSessionProvider({ children }: { children: ReactNode 
       }
 
       const parsed = JSON.parse(raw) as StoredSegmentationSession;
-      return parsed.processedImages ?? [];
+
+      return (parsed.processedImages ?? []).map((img) => ({
+        ...img,
+        file: null,
+        fileSize:
+          typeof img.fileSize === 'number'
+            ? img.fileSize
+            : typeof img.file?.size === 'number'
+              ? img.file.size
+              : 0,
+      }));
     } catch {
       return [];
     }

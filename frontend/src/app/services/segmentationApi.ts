@@ -52,8 +52,9 @@ export interface SegmentationResult {
 }
 
 export interface ProcessedImage {
-  file: File;
+  file: File | null;
   fileName: string;
+  fileSize: number;
   result: SegmentationResult;
 }
 
@@ -217,6 +218,7 @@ export async function processBatch(
     results.push({
       file,
       fileName: file.name,
+      fileSize: file.size,
       result,
     });
 
