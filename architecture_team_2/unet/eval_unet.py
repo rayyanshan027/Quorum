@@ -55,6 +55,7 @@ def main():
     root_dir = cfg["data_root"]
     preprocess_mode = cfg.get("preprocess_mode", "basic")
     target_size = tuple(cfg.get("target_size", [256, 256]))
+    encoder_weights = cfg.get("encoder_weights", "imagenet")
 
     val_ids = CellDataset.load_split_ids("val_ids.txt")
 
@@ -75,10 +76,11 @@ def main():
     print("Device:", device)
     print("Checkpoint:", ckpt_path)
     print("Out dir:", out_dir)
+    print("encoder_weights:", encoder_weights)
 
     model = smp.Unet(
         encoder_name="resnet34",
-        encoder_weights="imagenet",
+        encoder_weights=encoder_weights,
         in_channels=1,
         classes=3,
     ).to(device)

@@ -139,6 +139,7 @@ def main():
     preprocess_mode = cfg.get("preprocess_mode", "basic")
     target_size = tuple(cfg.get("target_size", [256, 256]))
     aug_strength = str(cfg.get("augmentation", "standard")).lower()
+    encoder_weights = cfg.get("encoder_weights", "imagenet")
 
     out_dir = os.path.join("architecture_team_2", "unet", "runs_unet")
     os.makedirs(out_dir, exist_ok=True)
@@ -153,6 +154,7 @@ def main():
     print("preprocess_mode:", preprocess_mode)
     print("target_size:", target_size)
     print("augmentation:", aug_strength)
+    print("encoder_weights:", encoder_weights)
     print("out_dir:", out_dir)
 
     train_ids, val_ids = build_train_val_ids(
@@ -183,7 +185,7 @@ def main():
 
     model = smp.Unet(
         encoder_name="resnet34",
-        encoder_weights="imagenet",
+        encoder_weights=encoder_weights,
         in_channels=1,
         classes=3,
     ).to(device)
