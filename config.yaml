@@ -1,4 +1,5 @@
-data_root: /content/drive/MyDrive/CMPUT469_Cell  # Path to dataset root (update if running locally)
+data_root: CMPUT469_Cell  # Dataset root relative to the repo
 preprocess_mode: basic         # 'basic' or 'full' (see instructions)
 augmentation: light        # 'none', 'light', or 'standard'
 target_size: [256, 256]        # [height, width] for resizing images and masks
+encoder_weights: imagenet  # Match U-Net++ defaults; set to null only if you explicitly want offline/local initialization
