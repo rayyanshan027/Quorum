@@ -31,6 +31,13 @@ Quorum/
 │       ├── train_unetpp.py
 │       ├── eval_unetpp.py
 │       └── infer_unetpp.py
+├── architecture_team_2/        # U-Net model
+│   └── unet/
+│       ├── runs_unet/
+│       │   └── best_unet.pt
+│       └── outputs_unet/
+│           ├── metrics.csv
+│           └── pred_masks/
 ├── architecture_team_3/        # Cellpose model
 │   └── cellpose/
 │       ├── train_cellpose.py
@@ -68,6 +75,16 @@ Quorum/
 │       ├── cp_chromo_no_aug
 │       └── cp_nucleus
 ├── frontend/                   # React frontend
+├── report_eval/                # Model comparison suite for report
+│   ├── compare_models.py       # Runs all 5 models, generates figures + CSVs
+│   ├── sanity_check.py         # Run this before compare_models.py
+│   ├── README.md
+│   └── outputs/                # Generated outputs (gitignored)
+│       ├── metrics_summary.csv
+│       ├── per_image_metrics.csv
+│       ├── statistical_tests.csv
+│       ├── confusion_matrices.csv
+│       └── figures/
 ├── data_utils/                 # Shared dataset pipeline
 │   └── dataset.py
 ├── Dockerfile.backend
