@@ -2,6 +2,9 @@
 
 A web app for automated segmentation of chromocenters, nuclei, and background in microscopy images.
 
+PowerPoint Presenttation: [T7-Quorum-Final-ish.pdf](https://github.com/user-attachments/files/26913877/T7-Quorum-Final-ish.pdf)
+
+
 ## Table of Contents
 
 - [Project Structure](#project-structure)
